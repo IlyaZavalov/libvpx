@@ -9,16 +9,11 @@ if (WIN32)
     set(COMMAND_PREFIX wsl --exec)
     list(APPEND CONFIGURE_OPTIONS --target=x86_64-win64-vs17)
     cmake_path(RELATIVE_PATH PATH_TO_CONFIG BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-#    execute_process(COMMAND wslpath ${PATH_TO_CONFIG} RESULT_VARIABLE PATH_TO_CONFIG)
 endif()
 
 if (BUILD_SHARED_LIBS)
     list(APPEND CONFIGURE_OPTIONS --enable-shared --disable-static)
 endif()
-
-configure_file(configure configure COPYONLY)
-
-message(${PATH_TO_CONFIG})
 
 ExternalProject_Add (vpx
         PREFIX ${PROJECT_BINARY_DIR}
@@ -26,7 +21,7 @@ ExternalProject_Add (vpx
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}
         CONFIGURE_COMMAND ${COMMAND_PREFIX} bash ${PATH_TO_CONFIG} ${CONFIGURE_OPTIONS}
         BUILD_COMMAND ${COMMAND_PREFIX} make
-        INSTALL_COMMAND ${COMMAND_PREFIX} make install
+        INSTALL_COMMAND ""
 )
 
 add_subdirectory(third_party/libyuv)
