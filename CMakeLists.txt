@@ -2,30 +2,50 @@ cmake_minimum_required(VERSION 3.25)
 include(ExternalProject)
 project(libvpx)
 
-set(CONFIGURE_OPTIONS --enable-pic --enable-vp8-decoder --enable-vp9-decoder --disable-vp8-encoder --disable-vp9-encoder --disable-docs --disable-examples --disable-libyuv --disable-unit-tests --disable-tools --as=nasm)
+function(generate_option_args OUTPUT_VAR)
+    set(RESULT "")
+    foreach (COMP  ${CONFIGURE_OPTIONS_ENABLE})
+        string(APPEND RESULT "--enable-${COMP} ")
+    endforeach()
+    foreach (COMP  ${CONFIGURE_OPTIONS_DISABLE})
+        string(APPEND RESULT "--disable-${COMP} ")
+    endforeach()
+    if (CONFIGURE_OPTIONS_TARGET)
+        string(APPEND RESULT "--target=${CONFIGURE_OPTIONS_TARGET} ")
+    endif()
+    if (CONFIGURE_OPTIONS_AS)
+        string(APPEND RESULT "--as=${CONFIGURE_OPTIONS_AS} ")
+    endif()
+    set(${OUTPUT_VAR} ${RESULT} PARENT_SCOPE)
+endfunction()
+
+set(CONFIGURE_OPTIONS_ENABLE pic vp8-decoder vp9-decoder)
+set(CONFIGURE_OPTIONS_DISABLE vp8-encoder vp9-encoder docs examples libyuv unit-tests tools)
+set(CONFIGURE_OPTIONS_AS yasm)
 set(PATH_TO_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configure)
 
 if (WIN32)
-    set(COMMAND_PREFIX wsl --exec)
-    list(APPEND CONFIGURE_OPTIONS --target=x86_64-win64-vs17)
+    set(COMMAND_PREFIX bash -l -c)
+    list(APPEND CONFIGURE_OPTIONS_TARGET x86_64-win64-vs17)
+    set(CONFIGURE_OPTIONS_AS nasm)
     cmake_path(RELATIVE_PATH PATH_TO_CONFIG BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
 if (NOT WIN32 AND BUILD_SHARED_LIBS)
-    list(APPEND CONFIGURE_OPTIONS --enable-shared --disable-static)
+    list(APPEND --enable-shared --disable-static)
 endif()
 
-ExternalProject_Add (external_vpx
+generate_option_args(CONFIGURE_ARGS)
+set(CONFIGURE_COMMAND ${PATH_TO_CONFIG})
+string(APPEND CONFIGURE_COMMAND " " ${CONFIGURE_ARGS})
+
+ExternalProject_Add (external-vpx
         PREFIX ${PROJECT_BINARY_DIR}
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}
-        CONFIGURE_COMMAND ${COMMAND_PREFIX} bash ${PATH_TO_CONFIG} ${CONFIGURE_OPTIONS}
-        BUILD_COMMAND ${COMMAND_PREFIX} make
+        CONFIGURE_COMMAND ${COMMAND_PREFIX} ${CONFIGURE_COMMAND}
+        BUILD_COMMAND ${COMMAND_PREFIX} "make"
         INSTALL_COMMAND ""
 )
-
-add_library(vpx INTERFACE)
-target_include_directories(vpx INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-
 
 add_subdirectory(third_party/libyuv)
