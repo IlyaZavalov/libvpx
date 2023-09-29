@@ -15,7 +15,7 @@ if (NOT WIN32 AND BUILD_SHARED_LIBS)
     list(APPEND CONFIGURE_OPTIONS --enable-shared --disable-static)
 endif()
 
-ExternalProject_Add (vpx
+ExternalProject_Add (external_vpx
         PREFIX ${PROJECT_BINARY_DIR}
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}
@@ -23,5 +23,9 @@ ExternalProject_Add (vpx
         BUILD_COMMAND ${COMMAND_PREFIX} make
         INSTALL_COMMAND ""
 )
+
+add_library(vpx INTERFACE)
+target_include_directories(vpx INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
 
 add_subdirectory(third_party/libyuv)
