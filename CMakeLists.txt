@@ -11,7 +11,7 @@ if (WIN32)
     cmake_path(RELATIVE_PATH PATH_TO_CONFIG BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
-if (BUILD_SHARED_LIBS)
+if (NOT WIN32 AND BUILD_SHARED_LIBS)
     list(APPEND CONFIGURE_OPTIONS --enable-shared --disable-static)
 endif()
 
