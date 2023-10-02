@@ -49,6 +49,6 @@ ExternalProject_Add (libvpx
 add_library(vpx INTERFACE)
 target_include_directories(vpx INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(vpx INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(vpx INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/libvpx.${CMAKE_STATIC_LIBRARY_SUFFIX})
+target_link_libraries(vpx INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/libvpx${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 add_subdirectory(third_party/libyuv)
