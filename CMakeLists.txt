@@ -2,19 +2,18 @@ cmake_minimum_required(VERSION 3.25)
 include(ExternalProject)
 project(libvpx)
 
-function(generate_option_args OUTPUT_VAR)
-    set(RESULT "")
+function(generate_option_args_list OUTPUT_VAR)
     foreach (COMP  ${CONFIGURE_OPTIONS_ENABLE})
-        string(APPEND RESULT "--enable-${COMP} ")
+        list(APPEND RESULT --enable-${COMP} )
     endforeach()
     foreach (COMP  ${CONFIGURE_OPTIONS_DISABLE})
-        string(APPEND RESULT "--disable-${COMP} ")
+        list(APPEND RESULT --disable-${COMP} )
     endforeach()
     if (CONFIGURE_OPTIONS_TARGET)
-        string(APPEND RESULT "--target=${CONFIGURE_OPTIONS_TARGET} ")
+        list(APPEND RESULT --target=${CONFIGURE_OPTIONS_TARGET} )
     endif()
     if (CONFIGURE_OPTIONS_AS)
-        string(APPEND RESULT "--as=${CONFIGURE_OPTIONS_AS} ")
+        list(APPEND RESULT --as=${CONFIGURE_OPTIONS_AS} )
     endif()
     set(${OUTPUT_VAR} ${RESULT} PARENT_SCOPE)
 endfunction()
@@ -35,17 +34,21 @@ if (NOT WIN32 AND BUILD_SHARED_LIBS)
     list(APPEND --enable-shared --disable-static)
 endif()
 
-generate_option_args(CONFIGURE_ARGS)
-set(CONFIGURE_COMMAND ${PATH_TO_CONFIG})
-string(APPEND CONFIGURE_COMMAND " " ${CONFIGURE_ARGS})
+generate_option_args_list(CONFIGURE_ARGS)
+set(CONFIGURE_COMMAND ${PATH_TO_CONFIG} ${CONFIGURE_ARGS})
+#string(APPEND CONFIGURE_COMMAND " " ${CONFIGURE_ARGS})
 
-ExternalProject_Add (external-vpx
+if(NOT WIN32)
+    set(INSTALL_COMMAND make install)
+endif()
+
+ExternalProject_Add (libvpx
         PREFIX ${PROJECT_BINARY_DIR}
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}
         CONFIGURE_COMMAND ${COMMAND_PREFIX} ${CONFIGURE_COMMAND}
-        BUILD_COMMAND ${COMMAND_PREFIX} "make"
-        INSTALL_COMMAND ""
+        BUILD_COMMAND ${COMMAND_PREFIX} make
+        INSTALL_COMMAND ${COMMAND_PREFIX} ${INSTALL_COMMAND}
 )
 
 add_subdirectory(third_party/libyuv)
