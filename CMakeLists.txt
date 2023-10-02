@@ -51,4 +51,8 @@ ExternalProject_Add (libvpx
         INSTALL_COMMAND ${COMMAND_PREFIX} ${INSTALL_COMMAND}
 )
 
+add_library(vpxtools tools_common.h tools_common.c)
+target_include_directories(vpxtools PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(vpxtools PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
 add_subdirectory(third_party/libyuv)
