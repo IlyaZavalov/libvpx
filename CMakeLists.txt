@@ -36,7 +36,6 @@ endif()
 
 generate_option_args_list(CONFIGURE_ARGS)
 set(CONFIGURE_COMMAND ${PATH_TO_CONFIG} ${CONFIGURE_ARGS})
-#string(APPEND CONFIGURE_COMMAND " " ${CONFIGURE_ARGS})
 
 if(NOT WIN32)
     set(INSTALL_COMMAND make install)
@@ -50,9 +49,5 @@ ExternalProject_Add (libvpx
         BUILD_COMMAND ${COMMAND_PREFIX} make
         INSTALL_COMMAND ${COMMAND_PREFIX} ${INSTALL_COMMAND}
 )
-
-add_library(vpxtools tools_common.h tools_common.c)
-target_include_directories(vpxtools PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(vpxtools PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(third_party/libyuv)
